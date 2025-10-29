@@ -9,6 +9,8 @@ on:
 jobs:
   generate-sitemap:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout repository
@@ -24,10 +26,11 @@ jobs:
       - name: Generate sitemap.xml
         run: python generate_sitemap.py
       
-      - name: Check if sitemap.xml changed
+      - name: Check if sitemap.xml changed or is new
         id: check_changes
         run: |
-          if git diff --quiet sitemap.xml; then
+          git add -N sitemap.xml 2>/dev/null || true
+          if git diff --quiet sitemap.xml 2>/dev/null && [ -f sitemap.xml ]; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
